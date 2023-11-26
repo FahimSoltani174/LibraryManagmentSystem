@@ -3,6 +3,13 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
  */
 package jFrame;
+import static jFrame.DBConnection.con;
+import java.net.URL;
+import java.sql.DriverManager;
+import javax.swing.table.DefaultTableModel;
+import java.sql.*;
+import javax.swing.JOptionPane;
+import javax.swing.table.TableModel;
 
 /**
  *
@@ -13,8 +20,132 @@ public class ManageBooks extends javax.swing.JFrame {
     /**
      * Creates new form ManageBooks
      */
+    
+    String bookName,author;
+    int bookId, quantity;
+    DefaultTableModel model;
+    
     public ManageBooks() {
         initComponents();
+        setBookDetailsToTable();
+    }
+    
+    // to set the book details into the table
+    public void setBookDetailsToTable() {
+
+        try {
+            Class.forName("com.mysql.jdbc.Driver");
+            Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/library_ms", "root", "");
+            Statement st = con.createStatement();
+            ResultSet rs = st.executeQuery("select * from book_details");
+
+            while (rs.next()) {
+                String bookId = rs.getString("book_id");
+                String bookName = rs.getString("book_name");
+                String author = rs.getString("author");
+                int quantity = rs.getInt("quantity");
+
+                Object[] obj = { bookId, bookName, author, quantity };
+                model = (DefaultTableModel) tbl_bookDetails.getModel();
+                model.addRow(obj);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    
+        // to add book to book_details table
+    public boolean addBook() {
+        boolean isAdded = false;
+        bookId = Integer.parseInt(txt_bookId.getText());
+        bookName = txt_bookName.getText();
+        author = txt_authorName.getText();
+        quantity = Integer.parseInt(txt_quantity.getText());
+
+        try {
+            Connection con = DBConnection.getConnection();
+            String sql = "insert into book_details values(?,?,?,?)";
+            PreparedStatement pst = con.prepareStatement(sql);
+            pst.setInt(1, bookId);
+            pst.setString(2, bookName);
+            pst.setString(3, author);
+            pst.setInt(4, quantity);
+
+            int rowCount = pst.executeUpdate();
+            if (rowCount > 0) {
+                isAdded = true;
+            } else {
+                isAdded = false;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return isAdded;
+
+    }
+
+    // to update book details
+
+    public boolean updateBook() {
+        boolean isUpdated = false;
+        bookId = Integer.parseInt(txt_bookId.getText());
+        bookName = txt_bookName.getText();
+        author = txt_authorName.getText();
+        quantity = Integer.parseInt(txt_quantity.getText());
+
+        try {
+            Connection con = DBConnection.getConnection();
+            String sql = "update book_details set book_name = ?,author = ?,quantity = ? where book_id = ?";
+            PreparedStatement pst = con.prepareStatement(sql);
+            pst.setString(1, bookName);
+            pst.setString(2, author);
+            pst.setInt(3, quantity);
+            pst.setInt(4, bookId);
+
+            int rowCount = pst.executeUpdate();
+            if (rowCount > 0) {
+                isUpdated = true;
+            } else {
+                isUpdated = false;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return isUpdated;
+    }
+
+    // method to delete book detail
+    public boolean deleteBook() {
+        boolean isDeleted = false;
+        bookId = Integer.parseInt(txt_bookId.getText());
+
+        try {
+            Connection con = DBConnection.getConnection();
+            String sql = "delete from book_details where book_id = ? ";
+            PreparedStatement pst = con.prepareStatement(sql);
+            pst.setInt(1, bookId);
+
+            int rowCount = pst.executeUpdate();
+            if (rowCount > 0) {
+                isDeleted = true;
+            } else {
+                isDeleted = false;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return isDeleted;
+    }
+
+    // method to clear table
+
+    public void clearTable() {
+        DefaultTableModel model = (DefaultTableModel) tbl_bookDetails.getModel();
+        model.setRowCount(0);
     }
 
     /**
@@ -50,8 +181,11 @@ public class ManageBooks extends javax.swing.JFrame {
         jPanel6 = new javax.swing.JPanel();
         jLabel2 = new javax.swing.JLabel();
         jScrollPane2 = new javax.swing.JScrollPane();
-        rSTableMetro2 = new rojeru_san.complementos.RSTableMetro();
+        tbl_bookDetails = new rojeru_san.complementos.RSTableMetro();
         jLabel25 = new javax.swing.JLabel();
+        jPanel7 = new javax.swing.JPanel();
+        jLabel16 = new javax.swing.JLabel();
+        jLabel17 = new javax.swing.JLabel();
 
         javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
         jPanel3.setLayout(jPanel3Layout);
@@ -166,14 +300,34 @@ public class ManageBooks extends javax.swing.JFrame {
 
         rSMaterialButtonCircle1.setBackground(new java.awt.Color(255, 51, 51));
         rSMaterialButtonCircle1.setText("Delete");
+        rSMaterialButtonCircle1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                rSMaterialButtonCircle1ActionPerformed(evt);
+            }
+        });
         jPanel2.add(rSMaterialButtonCircle1, new org.netbeans.lib.awtextra.AbsoluteConstraints(390, 600, 130, 70));
 
         rSMaterialButtonCircle2.setBackground(new java.awt.Color(255, 51, 51));
         rSMaterialButtonCircle2.setText("Add");
+        rSMaterialButtonCircle2.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                rSMaterialButtonCircle2MouseClicked(evt);
+            }
+        });
+        rSMaterialButtonCircle2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                rSMaterialButtonCircle2ActionPerformed(evt);
+            }
+        });
         jPanel2.add(rSMaterialButtonCircle2, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 600, 130, 70));
 
         rSMaterialButtonCircle3.setBackground(new java.awt.Color(255, 51, 51));
         rSMaterialButtonCircle3.setText("Update");
+        rSMaterialButtonCircle3.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                rSMaterialButtonCircle3ActionPerformed(evt);
+            }
+        });
         jPanel2.add(rSMaterialButtonCircle3, new org.netbeans.lib.awtextra.AbsoluteConstraints(220, 600, 130, 70));
 
         txt_bookId.setBackground(new java.awt.Color(102, 102, 255));
@@ -229,36 +383,57 @@ public class ManageBooks extends javax.swing.JFrame {
                 jLabel2MouseClicked(evt);
             }
         });
-        jPanel6.add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 0, 60, 50));
+        jPanel6.add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 0, 60, 50));
 
-        rSTableMetro2.setModel(new javax.swing.table.DefaultTableModel(
+        tbl_bookDetails.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
-                {"123", "jk", "jk", "jkj"},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null}
+
             },
             new String [] {
                 "Book Id", "Name", "Author", "Quantity"
             }
         ));
-        rSTableMetro2.setColorBackgoundHead(new java.awt.Color(102, 102, 255));
-        rSTableMetro2.setColorBordeFilas(new java.awt.Color(102, 102, 255));
-        rSTableMetro2.setColorFilasBackgound2(new java.awt.Color(255, 255, 255));
-        rSTableMetro2.setColorSelBackgound(new java.awt.Color(255, 51, 51));
-        rSTableMetro2.setFont(new java.awt.Font("Yu Gothic UI Light", 0, 25)); // NOI18N
-        rSTableMetro2.setFuenteFilas(new java.awt.Font("Yu Gothic UI Semibold", 0, 18)); // NOI18N
-        rSTableMetro2.setFuenteFilasSelect(new java.awt.Font("Yu Gothic UI", 1, 20)); // NOI18N
-        rSTableMetro2.setFuenteHead(new java.awt.Font("Yu Gothic UI Semibold", 1, 20)); // NOI18N
-        rSTableMetro2.setRowHeight(40);
-        jScrollPane2.setViewportView(rSTableMetro2);
+        tbl_bookDetails.setColorBackgoundHead(new java.awt.Color(102, 102, 255));
+        tbl_bookDetails.setColorBordeFilas(new java.awt.Color(102, 102, 255));
+        tbl_bookDetails.setColorFilasBackgound2(new java.awt.Color(255, 255, 255));
+        tbl_bookDetails.setColorSelBackgound(new java.awt.Color(255, 51, 51));
+        tbl_bookDetails.setFont(new java.awt.Font("Yu Gothic UI Light", 0, 25)); // NOI18N
+        tbl_bookDetails.setFuenteFilas(new java.awt.Font("Yu Gothic UI Semibold", 0, 18)); // NOI18N
+        tbl_bookDetails.setFuenteFilasSelect(new java.awt.Font("Yu Gothic UI", 1, 20)); // NOI18N
+        tbl_bookDetails.setFuenteHead(new java.awt.Font("Yu Gothic UI Semibold", 1, 20)); // NOI18N
+        tbl_bookDetails.setRowHeight(40);
+        tbl_bookDetails.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                tbl_bookDetailsMouseClicked(evt);
+            }
+        });
+        jScrollPane2.setViewportView(tbl_bookDetails);
 
         jLabel25.setFont(new java.awt.Font("Segoe UI Black", 0, 20)); // NOI18N
         jLabel25.setForeground(new java.awt.Color(102, 102, 102));
         jLabel25.setText("Book Details");
+
+        jPanel7.setBackground(new java.awt.Color(255, 51, 51));
+
+        javax.swing.GroupLayout jPanel7Layout = new javax.swing.GroupLayout(jPanel7);
+        jPanel7.setLayout(jPanel7Layout);
+        jPanel7Layout.setHorizontalGroup(
+            jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 424, Short.MAX_VALUE)
+        );
+        jPanel7Layout.setVerticalGroup(
+            jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 7, Short.MAX_VALUE)
+        );
+
+        jLabel16.setFont(new java.awt.Font("Yu Gothic UI Semibold", 0, 36)); // NOI18N
+        jLabel16.setForeground(new java.awt.Color(255, 51, 51));
+        jLabel16.setText("Manage Books");
+
+        jLabel17.setFont(new java.awt.Font("Yu Gothic UI Semibold", 0, 18)); // NOI18N
+        jLabel17.setForeground(new java.awt.Color(255, 153, 51));
+        jLabel17.setIcon(new javax.swing.ImageIcon(getClass().getResource("/AddNewBookIcons/icons8_Books_52px_1.png"))); // NOI18N
+        jLabel17.setToolTipText("");
 
         javax.swing.GroupLayout jPanel5Layout = new javax.swing.GroupLayout(jPanel5);
         jPanel5.setLayout(jPanel5Layout);
@@ -266,24 +441,41 @@ public class ManageBooks extends javax.swing.JFrame {
             jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel5Layout.createSequentialGroup()
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(jPanel6, javax.swing.GroupLayout.PREFERRED_SIZE, 132, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap())
+                .addComponent(jPanel6, javax.swing.GroupLayout.PREFERRED_SIZE, 47, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(91, 91, 91))
             .addGroup(jPanel5Layout.createSequentialGroup()
-                .addGap(139, 139, 139)
                 .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jLabel25, javax.swing.GroupLayout.PREFERRED_SIZE, 260, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 840, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(jPanel5Layout.createSequentialGroup()
+                        .addGap(139, 139, 139)
+                        .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jLabel25, javax.swing.GroupLayout.PREFERRED_SIZE, 260, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 840, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                    .addGroup(jPanel5Layout.createSequentialGroup()
+                        .addGap(288, 288, 288)
+                        .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel5Layout.createSequentialGroup()
+                                .addGap(32, 32, 32)
+                                .addComponent(jLabel17, javax.swing.GroupLayout.PREFERRED_SIZE, 62, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jLabel16))
+                            .addComponent(jPanel7, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))
                 .addContainerGap(171, Short.MAX_VALUE))
         );
         jPanel5Layout.setVerticalGroup(
             jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel5Layout.createSequentialGroup()
                 .addComponent(jPanel6, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(40, 40, 40)
-                .addComponent(jLabel25, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(60, 60, 60)
+                .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jLabel16)
+                    .addComponent(jLabel17))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(jPanel7, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 83, Short.MAX_VALUE)
+                .addComponent(jLabel25, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(26, 26, 26)
                 .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 350, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(0, 348, Short.MAX_VALUE))
+                .addGap(160, 160, 160))
         );
 
         getContentPane().add(jPanel5, new org.netbeans.lib.awtextra.AbsoluteConstraints(580, 0, 1150, 830));
@@ -323,6 +515,55 @@ public class ManageBooks extends javax.swing.JFrame {
         // TODO add your handling code here:
         System.exit(0);
     }//GEN-LAST:event_jPanel6MouseClicked
+
+    private void tbl_bookDetailsMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tbl_bookDetailsMouseClicked
+       int rowNo = tbl_bookDetails.getSelectedRow();
+       TableModel model = tbl_bookDetails.getModel();
+       
+    txt_bookId.setText(model.getValueAt(rowNo, 0).toString());
+    txt_bookName.setText(model.getValueAt(rowNo , 1).toString());
+    txt_authorName.setText(model.getValueAt(rowNo , 2).toString());
+    txt_quantity.setText(model.getValueAt(rowNo , 3).toString());
+    }//GEN-LAST:event_tbl_bookDetailsMouseClicked
+
+    private void rSMaterialButtonCircle2MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_rSMaterialButtonCircle2MouseClicked
+        // TODO add your handling code here:
+        
+    }//GEN-LAST:event_rSMaterialButtonCircle2MouseClicked
+
+    private void rSMaterialButtonCircle2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_rSMaterialButtonCircle2ActionPerformed
+        // TODO add your handling code here:
+             if (addBook() == true) {
+            JOptionPane.showMessageDialog(this, "Book Added");
+            clearTable();
+            setBookDetailsToTable();
+        }else{
+            JOptionPane.showMessageDialog(this, "Book Addition Failed");
+        }
+        
+    }//GEN-LAST:event_rSMaterialButtonCircle2ActionPerformed
+
+    private void rSMaterialButtonCircle3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_rSMaterialButtonCircle3ActionPerformed
+        // TODO add your handling code here:
+           if (updateBook() == true) {
+            JOptionPane.showMessageDialog(this, "Book Updated");
+            clearTable();
+            setBookDetailsToTable();
+        }else{
+            JOptionPane.showMessageDialog(this, "Book Updation Failed");
+        }
+    }//GEN-LAST:event_rSMaterialButtonCircle3ActionPerformed
+
+    private void rSMaterialButtonCircle1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_rSMaterialButtonCircle1ActionPerformed
+        // TODO add your handling code here:
+          if (deleteBook()== true) {
+            JOptionPane.showMessageDialog(this, "Book Deleted");
+            clearTable();
+            setBookDetailsToTable();
+        }else{
+            JOptionPane.showMessageDialog(this, "Book Deletion Failed");
+        }
+    }//GEN-LAST:event_rSMaterialButtonCircle1ActionPerformed
 
     /**
      * @param args the command line arguments
@@ -367,6 +608,8 @@ public class ManageBooks extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel13;
     private javax.swing.JLabel jLabel14;
     private javax.swing.JLabel jLabel15;
+    private javax.swing.JLabel jLabel16;
+    private javax.swing.JLabel jLabel17;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel25;
     private javax.swing.JLabel jLabel8;
@@ -377,11 +620,12 @@ public class ManageBooks extends javax.swing.JFrame {
     private javax.swing.JPanel jPanel4;
     private javax.swing.JPanel jPanel5;
     private javax.swing.JPanel jPanel6;
+    private javax.swing.JPanel jPanel7;
     private javax.swing.JScrollPane jScrollPane2;
     private rojerusan.RSMaterialButtonCircle rSMaterialButtonCircle1;
     private rojerusan.RSMaterialButtonCircle rSMaterialButtonCircle2;
     private rojerusan.RSMaterialButtonCircle rSMaterialButtonCircle3;
-    private rojeru_san.complementos.RSTableMetro rSTableMetro2;
+    private rojeru_san.complementos.RSTableMetro tbl_bookDetails;
     private app.bolivia.swing.JCTextField txt_authorName;
     private app.bolivia.swing.JCTextField txt_bookId;
     private app.bolivia.swing.JCTextField txt_bookName;

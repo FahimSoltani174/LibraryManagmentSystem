@@ -8,6 +8,7 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.Statement;
 import javax.swing.JOptionPane;
+import java.net.URL;
 
 /**
  *
@@ -318,7 +319,7 @@ public class SignupPage extends javax.swing.JFrame {
         jLabel15.setText("Contact");
 
         txt_password.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
-        txt_password.setPlaceholder("Enter Username");
+        txt_password.setPlaceholder("Enter Password");
         txt_password.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 txt_passwordActionPerformed(evt);
@@ -326,10 +327,15 @@ public class SignupPage extends javax.swing.JFrame {
         });
 
         txt_email.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
-        txt_email.setPlaceholder("Enter Username");
+        txt_email.setPlaceholder("Enter Email");
 
         txt_contact.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
-        txt_contact.setPlaceholder("Enter Username");
+        txt_contact.setPlaceholder("Enter Phone Number");
+        txt_contact.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                txt_contactActionPerformed(evt);
+            }
+        });
 
         txt_username.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
         txt_username.setPlaceholder("Enter Username");
@@ -348,7 +354,7 @@ public class SignupPage extends javax.swing.JFrame {
         });
 
         rSMaterialButtonCircle2.setBackground(new java.awt.Color(255, 51, 51));
-        rSMaterialButtonCircle2.setText("Signup");
+        rSMaterialButtonCircle2.setText("Add Account");
         rSMaterialButtonCircle2.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 rSMaterialButtonCircle2MouseClicked(evt);
@@ -501,6 +507,10 @@ public class SignupPage extends javax.swing.JFrame {
     private void rSMaterialButtonCircle2MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_rSMaterialButtonCircle2MouseClicked
         // TODO add your handling code here:
     }//GEN-LAST:event_rSMaterialButtonCircle2MouseClicked
+
+    private void txt_contactActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txt_contactActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_txt_contactActionPerformed
 
     /**
      * @param args the command line arguments
